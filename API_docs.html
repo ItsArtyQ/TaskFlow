@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskFlow API Documentation</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --soft: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --green: #22c55e;
+      --blue: #3b82f6;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --purple: #8b5cf6;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, Arial, sans-serif;
+      line-height: 1.6;
+      display: flex;
+    }
+
+    aside {
+      width: 280px;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+      background: #020617;
+      border-right: 1px solid var(--border);
+      padding: 32px 24px;
+    }
+
+    aside h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    aside p {
+      color: var(--muted);
+      margin-bottom: 32px;
+      font-size: 14px;
+    }
+
+    nav {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: 0.2s;
+      font-size: 15px;
+    }
+
+    nav a:hover {
+      color: white;
+      transform: translateX(4px);
+    }
+
+    main {
+      flex: 1;
+      padding: 48px;
+      max-width: 1200px;
+    }
+
+    section {
+      margin-bottom: 64px;
+    }
+
+    h2 {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      margin-top: 32px;
+      margin-bottom: 16px;
+      font-size: 22px;
+    }
+
+    p {
+      color: #cbd5e1;
+      margin-bottom: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      margin-top: 20px;
+    }
+
+    .endpoint {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--soft);
+      padding: 18px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+    }
+
+    .method {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    .get { background: var(--blue); }
+    .post { background: var(--green); }
+    .patch { background: var(--yellow); color: black; }
+    .delete { background: var(--red); }
+
+    code, pre {
+      font-family: Consolas, monospace;
+    }
+
+    pre {
+      background: #020617;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      overflow-x: auto;
+      margin-top: 16px;
+      color: #e2e8f0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 14px;
+      text-align: left;
+    }
+
+    th {
+      background: #1e293b;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--purple);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .status-card {
+      background: var(--soft);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .status-card strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        flex-direction: column;
+      }
+
+      aside {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+
+      main {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <aside>
+    <h1>TaskFlow API</h1>
+    <p>Production-like backend documentation</p>
+
+    <nav>
+      <a href="#overview">Overview</a>
+      <a href="#auth">Authentication</a>
+      <a href="#users">Users</a>
+      <a href="#boards">Boards</a>
+      <a href="#tasks">Tasks</a>
+      <a href="#comments">Comments</a>
+      <a href="#errors">Errors</a>
+      <a href="#statuses">HTTP Statuses</a>
+    </nav>
+  </aside>
+
+  <main>
+    <section id="overview">
+      <span class="badge">v1.0</span>
+      <h2>Overview</h2>
+      <p>
+        TaskFlow API — REST API для системы управления задачами.
+        API построен по REST-принципам и использует JWT авторизацию.
+      </p>
+
+      <div class="card">
+        <h3>Base URL</h3>
+        <pre>http://localhost:3000/api</pre>
+      </div>
+
+      <div class="card">
+        <h3>Content-Type</h3>
+        <pre>application/json</pre>
+      </div>
+    </section>
+
+    <section id="auth">
+      <h2>Authentication</h2>
+
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <code>/auth/register</code>
+      </div>
+
+      <div class="card">
+        <h3>Request Body</h3>
+
+        <table>
+          <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Description</th>
+          </tr>
+          <tr>
+            <td>email</td>
+            <td>string</td>
+            <td>User email</td>
+          </tr>
+          <tr>
+            <td>username</td>
+            <td>string</td>
+            <td>Username</td>
+          </tr>
+          <tr>
+            <td>password</td>
+            <td>string</td>
+            <td>User password</td>
+          </tr>
+        </table>
+
+        <pre>{
+  "email": "user@example.com",
+  "username": "artem",
+  "password": "12345678"
+}</pre>
+      </div>
+
+      <div class="card">
+        <h3>Response</h3>
+
+        <pre>{
+  "data": {
+    "user": {
+      "id": "uuid",
+      "email": "user@example.com",
+      "username": "artem"
+    },
+    "accessToken": "jwt-token"
+  }
+}</pre>
+      </div>
+
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <code>/auth/login</code>
+      </div>
+    </section>
+
+    <section id="users">
+      <h2>Users</h2>
+
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <code>/users/me</code>
+      </div>
+
+      <div class="card">
+        <h3>Headers</h3>
+
+        <pre>Authorization: Bearer jwt-token</pre>
+      </div>
+
+      <div class="card">
+        <h3>Response</h3>
+
+        <pre>{
+  "data": {
+    "id": "uuid",
+    "email": "user@example.com",
+    "username": "artem",
+    "createdAt": "2026-05-17T12:00:00.000Z"
+  }
+}</pre>
+      </div>
+    </section>
+
+    <section id="boards">
+      <h2>Boards</h2>
+
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <code>/boards</code>
+      </div>
+
+      <div class="card">
+        <h3>Request Body</h3>
+
+        <pre>{
+  "title": "Backend Development"
+}</pre>
+      </div>
+
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <code>/boards</code>
+      </div>
+
+      <div class="endpoint">
+        <span class="method patch">PATCH</span>
+        <code>/boards/:id</code>
+      </div>
+
+      <div class="endpoint">
+        <span class="method delete">DELETE</span>
+        <code>/boards/:id</code>
+      </div>
+    </section>
+
+    <section id="tasks">
+      <h2>Tasks</h2>
+
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <code>/tasks</code>
+      </div>
+
+      <div class="card">
+        <h3>Request Body</h3>
+
+        <pre>{
+  "title": "Implement JWT",
+  "description": "Create access token flow",
+  "boardId": "uuid"
+}</pre>
+      </div>
+
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <code>/tasks</code>
+      </div>
+
+      <div class="endpoint">
+        <span class="method patch">PATCH</span>
+        <code>/tasks/:id</code>
+      </div>
+
+      <div class="endpoint">
+        <span class="method delete">DELETE</span>
+        <code>/tasks/:id</code>
+      </div>
+    </section>
+
+    <section id="comments">
+      <h2>Comments</h2>
+
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <code>/tasks/:id/comments</code>
+      </div>
+
+      <div class="card">
+        <h3>Request Body</h3>
+
+        <pre>{
+  "content": "Need to improve validation"
+}</pre>
+      </div>
+    </section>
+
+    <section id="errors">
+      <h2>Error Format</h2>
+
+      <div class="card">
+        <pre>{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid email"
+  }
+}</pre>
+      </div>
+    </section>
+
+    <section id="statuses">
+      <h2>HTTP Statuses</h2>
+
+      <div class="status-grid">
+        <div class="status-card">
+          <strong>200 OK</strong>
+          Successful request
+        </div>
+
+        <div class="status-card">
+          <strong>201 Created</strong>
+          Resource created
+        </div>
+
+        <div class="status-card">
+          <strong>400 Bad Request</strong>
+          Validation failed
+        </div>
+
+        <div class="status-card">
+          <strong>401 Unauthorized</strong>
+          Invalid token
+        </div>
+
+        <div class="status-card">
+          <strong>403 Forbidden</strong>
+          No permissions
+        </div>
+
+        <div class="status-card">
+          <strong>404 Not Found</strong>
+          Resource not found
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
